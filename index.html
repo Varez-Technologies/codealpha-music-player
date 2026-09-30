@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeAlpha Music Player</title>
+
+  <!-- Primary font: Plus Jakarta Sans — used for all text in the player UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Material Icons for playback controls (play, pause, skip, shuffle, repeat, volume) -->
+  <link
+    href="https://fonts.googleapis.com/icon?family=Material+Icons+Round"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!--
+    App root wrapper.
+    Two-column layout: left sidebar = playlist, right panel = player.
+    On smaller screens the sidebar collapses to a drawer.
+  -->
+  <div class="app-wrapper">
+
+    <!-- Left sidebar: shows the full song list and a search bar -->
+    <aside class="sidebar">
+
+      <!-- Sidebar header with app icon and name -->
+      <div class="sidebar-header">
+        <span class="material-icons-round brand-icon">queue_music</span>
+        <span class="brand-name">CodeAlpha Music Player</span>
+      </div>
+
+      <!-- Search bar: filters the playlist rows in real time -->
+      <div class="search-bar">
+        <span class="material-icons-round search-icon">search</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search songs..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Playlist track rows — populated dynamically by script.js -->
+      <ul class="playlist" id="playlist">
+        <!-- Rows injected by renderPlaylist() in script.js -->
+      </ul>
+
+    </aside>
+
+    <!-- Right panel: main player with album art, controls, progress, and volume -->
+    <main class="player-panel">
+
+      <!-- Ambient glow that reflects the current album art colour -->
+      <div class="ambient-glow" id="ambientGlow"></div>
+
+      <!-- Album artwork — rotates slowly while the track is playing -->
+      <div class="artwork-wrapper" id="artworkWrapper">
+        <img
+          src="songs/covers/cover1.jpg"
+          alt="Tum Hi Ho"
+          id="albumArt"
+          class="album-art"
+        />
+        <!-- Hover overlay with a play icon -->
+        <div class="art-overlay">
+          <span class="material-icons-round">play_circle</span>
+        </div>
+      </div>
+
+      <!-- Current song title and artist name -->
+      <div class="song-info">
+        <h2 class="song-title" id="songTitle">Tum Hi Ho</h2>
+        <p class="artist-name" id="artistName">Arijit Singh (Aashiqui 2)</p>
+      </div>
+
+      <!-- Progress bar section: elapsed time / seek slider / total duration -->
+      <div class="progress-section">
+        <!-- Elapsed playback time -->
+        <span class="time-label" id="currentTime">0:00</span>
+
+        <!-- Seek slider wrapper — click or drag to seek -->
+        <div class="progress-wrapper">
+          <!-- Background fill showing how much has buffered -->
+          <div class="buffered-track" id="bufferedTrack"></div>
+          <!-- Foreground fill tracking actual playhead position -->
+          <div class="active-track" id="activeTrack"></div>
+          <!-- Invisible native range input layered on top for interaction -->
+          <input
+            type="range"
+            id="progressBar"
+            class="slider progress-slider"
+            value="0"
+            min="0"
+            max="100"
+            step="0.1"
+          />
+        </div>
+
+        <!-- Total track duration -->
+        <span class="time-label" id="totalDuration">0:00</span>
+      </div>
+
+      <!-- Playback controls: Shuffle | Previous | Play/Pause | Next | Repeat -->
+      <div class="controls">
+
+        <!-- Shuffle toggle -->
+        <button class="ctrl-btn secondary-btn" id="shuffleBtn" title="Shuffle">
+          <span class="material-icons-round">shuffle</span>
+        </button>
+
+        <!-- Go to previous track -->
+        <button class="ctrl-btn secondary-btn" id="prevBtn" title="Previous">
+          <span class="material-icons-round">skip_previous</span>
+        </button>
+
+        <!-- Main play / pause button -->
+        <button class="ctrl-btn primary-btn" id="playPauseBtn" title="Play">
+          <span class="material-icons-round" id="playIcon">play_arrow</span>
+        </button>
+
+        <!-- Go to next track -->
+        <button class="ctrl-btn secondary-btn" id="nextBtn" title="Next">
+          <span class="material-icons-round">skip_next</span>
+        </button>
+
+        <!-- Repeat toggle (off / repeat-one / repeat-all) -->
+        <button class="ctrl-btn secondary-btn" id="repeatBtn" title="Repeat">
+          <span class="material-icons-round">repeat</span>
+        </button>
+
+      </div>
+
+      <!-- Volume control: mute toggle, slider, and percentage label -->
+      <div class="volume-section">
+        <!-- Mute / unmute icon button -->
+        <button class="vol-icon-btn" id="muteBtn" title="Mute">
+          <span class="material-icons-round" id="volIcon">volume_up</span>
+        </button>
+
+        <!-- Volume slider -->
+        <div class="progress-wrapper volume-wrapper">
+          <div class="active-track volume-active-track" id="volumeActiveTrack"></div>
+          <input
+            type="range"
+            id="volumeSlider"
+            class="slider volume-slider"
+            value="80"
+            min="0"
+            max="100"
+            step="1"
+          />
+        </div>
+
+        <!-- Volume percentage label -->
+        <span class="vol-label" id="volLabel">80%</span>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Hidden audio element — all playback is driven by script.js -->
+  <audio id="audioPlayer"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>

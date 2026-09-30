@@ -1,0 +1,686 @@
+/*
+  CodeAlpha Frontend Internship — Task 4: Music Player
+  Color Palette: Light Blue sidebar + Dark Player theme with warm yellow accents
+*/
+
+:root {
+  /* --- Main player background & surface colors --- */
+  --color-main-bg: #000000;
+  --color-main-card: #0A0A0A;
+  
+  /* --- Sidebar colors (light blue theme) --- */
+  --color-sidebar-bg: #E0F2FE;
+  --sidebar-border: #BAE6FD;
+  --sidebar-text-title: #0F172A;
+  --sidebar-text-muted: #475569;
+  --sidebar-text-faint: #64748B;
+  --sidebar-item-hover: rgba(255, 255, 255, 0.55);
+  --sidebar-item-active: #FFFFFF;
+  --sidebar-active-accent: #0284C7;
+
+  /* --- Accent colors (soft yellow highlights) --- */
+  --color-light-yellow: #FEF08A;
+  --color-light-yellow-soft: rgba(254, 240, 138, 0.45);
+  --color-light-yellow-glow: rgba(254, 240, 138, 0.18);
+  --color-light-yellow-hover: #FDE047;
+
+  /* --- Text colors for main player panel --- */
+  --text-main: #FFFFFF;
+  --text-muted: #94A3B8;
+  --text-faint: #64748B;
+}
+
+/* ============================================================
+   2. RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--color-main-bg);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* ============================================================
+   3. APP WRAPPER — Two-Column Layout
+   ============================================================ */
+.app-wrapper {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ============================================================
+   4. SIDEBAR — Light Blue Playlist Panel
+   ============================================================ */
+.sidebar {
+  background: var(--color-sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid rgba(186, 230, 253, 0.7);
+}
+
+.brand-icon {
+  font-size: 26px;
+  color: #0284C7; /* Refined Sky Blue */
+}
+
+.brand-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--sidebar-text-title);
+}
+
+/* Search Bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 16px 14px;
+  padding: 9px 14px;
+  background: #FFFFFF;
+  border: 1px solid #BAE6FD;
+  border-radius: 9999px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.search-bar:focus-within {
+  border-color: #0284C7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.search-icon {
+  font-size: 18px;
+  color: #64748B;
+  flex-shrink: 0;
+}
+
+.search-bar input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--sidebar-text-title);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  width: 100%;
+}
+
+.search-bar input::placeholder {
+  color: var(--sidebar-text-muted);
+}
+
+/* Playlist Rows */
+.playlist {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+  padding: 4px 10px 16px;
+}
+
+.playlist-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+  margin-bottom: 4px;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.playlist-item:hover {
+  background: var(--sidebar-item-hover);
+  transform: translateX(2px);
+}
+
+/* Active Song Card */
+.playlist-item.active {
+  background: var(--sidebar-item-active);
+  border: 1px solid var(--color-light-yellow); /* Subtle light yellow border */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.track-index {
+  width: 28px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sidebar-text-faint);
+  flex-shrink: 0;
+}
+
+/* Equalizer Bars */
+.equalizer {
+  display: none;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+  width: 28px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.equalizer span {
+  display: block;
+  width: 3px;
+  background: var(--sidebar-active-accent);
+  border-radius: 2px;
+  animation: equalize 0.8s ease-in-out infinite alternate;
+}
+.equalizer span:nth-child(1) { animation-delay: 0s;   animation-duration: 0.6s; }
+.equalizer span:nth-child(2) { animation-delay: 0.2s; animation-duration: 0.9s; }
+.equalizer span:nth-child(3) { animation-delay: 0.1s; animation-duration: 0.7s; }
+
+@keyframes equalize {
+  from { height: 4px;  opacity: 0.6; }
+  to   { height: 14px; opacity: 1;   }
+}
+
+.playlist-item.active .equalizer   { display: flex; }
+.playlist-item.active .track-index { display: none; }
+
+.track-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.track-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.track-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sidebar-text-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-artist {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--sidebar-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playlist-item.active .track-title {
+  color: var(--sidebar-active-accent);
+  font-weight: 700;
+}
+
+.track-duration {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sidebar-text-faint);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   5. MAIN PLAYER PANEL — Pure Black (#000000)
+   ============================================================ */
+.player-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 60px;
+  gap: 26px;
+  overflow: hidden;
+  background-color: var(--color-main-bg); /* Pure Black */
+}
+
+/* Subtle, soft warm glow (replaces harsh purple haze) */
+.ambient-glow {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-light-yellow-glow), transparent 70%);
+  filter: blur(80px);
+  opacity: 0.15;
+  pointer-events: none;
+  transition: opacity 1s ease;
+  z-index: 0;
+}
+
+/* ============================================================
+   6. ALBUM ARTWORK & VINYL (Light Yellow Border)
+   ============================================================ */
+.artwork-wrapper {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.album-art {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+  /* Light Yellow Border replacing purple neon */
+  border: 1.5px solid var(--color-light-yellow);
+  box-shadow:
+    0 10px 30px -4px rgba(0, 0, 0, 0.8),
+    0 0 16px var(--color-light-yellow-glow);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  background: #111111;
+  animation: rotateSlow 22s linear infinite;
+  animation-play-state: paused;
+}
+
+.artwork-wrapper.playing .album-art {
+  animation-play-state: running;
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+.art-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+.art-overlay .material-icons-round {
+  font-size: 56px;
+  color: var(--color-light-yellow);
+  filter: drop-shadow(0 0 10px rgba(254, 240, 138, 0.6));
+  transform: translateY(4px);
+  transition: transform 0.2s ease;
+}
+.artwork-wrapper:hover .art-overlay { opacity: 1; }
+.artwork-wrapper:hover .art-overlay .material-icons-round { transform: translateY(0px); }
+
+/* ============================================================
+   7. SONG INFO
+   ============================================================ */
+.song-info {
+  text-align: center;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.song-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  line-height: 28px;
+  max-width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artist-name {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* Audio Quality Badge */
+.quality-badge {
+  margin-top: 4px;
+  padding: 3px 11px;
+  background: rgba(254, 240, 138, 0.08);
+  border: 1px solid var(--color-light-yellow-soft);
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-light-yellow);
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   8. PROGRESS BAR — Bulletproof Seek & Light Yellow Rail
+   ============================================================ */
+.progress-section {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1;
+}
+
+.time-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  min-width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.progress-wrapper {
+  position: relative;
+  flex: 1;
+  height: 24px; /* Generous clickable target area */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.progress-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  pointer-events: none;
+  transition: height 0.15s ease;
+}
+
+.progress-wrapper:hover::before {
+  height: 6px;
+}
+
+.buffered-track {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  width: 0%;
+  pointer-events: none;
+}
+
+/* Light Yellow active progress fill */
+.active-track {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  background: var(--color-light-yellow);
+  box-shadow: 0 0 8px var(--color-light-yellow-glow);
+  border-radius: 9999px;
+  width: 0%;
+  pointer-events: none;
+  transition: height 0.15s ease;
+}
+
+.progress-wrapper:hover .active-track {
+  height: 6px;
+}
+
+/* Playhead handle indicator */
+.active-track::after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background-color: var(--color-light-yellow);
+  border: 2px solid #000000;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  z-index: 2;
+}
+
+/* ============================================================
+   9. PLAYBACK CONTROLS
+   ============================================================ */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 1;
+}
+
+.ctrl-btn {
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Secondary Buttons */
+.secondary-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+}
+.secondary-btn .material-icons-round { font-size: 22px; }
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-light-yellow-soft);
+  color: var(--color-light-yellow);
+  transform: scale(1.05);
+}
+
+/* Active Shuffle/Repeat with light yellow tint */
+.secondary-btn.active {
+  color: var(--color-light-yellow);
+  border-color: var(--color-light-yellow);
+  background: rgba(254, 240, 138, 0.08);
+}
+
+/* HERO Play/Pause button — Clean Light Yellow */
+.primary-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--color-light-yellow);
+  color: #000000; /* High contrast black icon */
+  box-shadow: 0 4px 20px var(--color-light-yellow-glow);
+}
+.primary-btn .material-icons-round { font-size: 32px; }
+
+.primary-btn:hover {
+  transform: scale(1.05);
+  background: var(--color-light-yellow-hover);
+  box-shadow: 0 6px 26px rgba(254, 240, 138, 0.35);
+}
+.primary-btn:active {
+  transform: scale(0.96);
+}
+
+/* ============================================================
+   10. VOLUME CONTROL
+   ============================================================ */
+.volume-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+  z-index: 1;
+}
+
+.vol-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+.vol-icon-btn:hover { color: var(--color-light-yellow); }
+.vol-icon-btn .material-icons-round { font-size: 20px; }
+
+.volume-wrapper {
+  position: relative;
+  flex: 1;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.volume-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.volume-active-track {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  background: var(--color-light-yellow);
+  border-radius: 9999px;
+  width: 80%;
+  pointer-events: none;
+}
+
+.vol-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  min-width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   11. RESPONSIVE (Tablet & Mobile)
+   ============================================================ */
+@media (max-width: 1279px) {
+  .app-wrapper {
+    grid-template-columns: 260px 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-wrapper {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    overflow-y: auto;
+  }
+
+  .sidebar {
+    max-height: 42vh;
+    border-right: none;
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+
+  .player-panel {
+    padding: 24px 20px;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  .artwork-wrapper {
+    width: 190px;
+    height: 190px;
+  }
+
+  .progress-section { max-width: 100%; }
+  .volume-section   { max-width: 100%; }
+}
